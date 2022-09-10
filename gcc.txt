@@ -1,0 +1,2 @@
+gcc `pkg-config --cflags gtk4` imagen.c `pkg-config --libs gtk4` -o imagen
+
