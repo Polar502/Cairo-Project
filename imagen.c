@@ -1,45 +1,68 @@
 #include <gtk/gtk.h>
-cairo_surface_t *bus;
-cairo_surface_t *car;
-cairo_surface_t *bridge_left;
-cairo_surface_t *bridge_right;
-cairo_surface_t *structure_bridge;
-
-
+cairo_surface_t *background;
+cairo_surface_t *clouds;
+cairo_surface_t *capa1;
+cairo_surface_t *capa2;
+cairo_surface_t *capa3;
+cairo_surface_t *cars;
+cairo_surface_t *boats;
+cairo_surface_t *bridge;
 
 
  
 static void draw_function (GtkDrawingArea *area, cairo_t *cr, int width, int height, gpointer user_data) {
    
-   // Bus Section
-   bus = cairo_image_surface_create_from_png("bus.png");
-   cairo_set_source_surface(cr,bus,1,1);
-   
-   cairo_paint(cr);
-   
-   // Car Section
-   car = cairo_image_surface_create_from_png("car.png");
-   cairo_set_source_surface(cr,car,1,100);
-   
-   cairo_paint(cr);
+   // background Section
+   background = cairo_image_surface_create_from_png("Background.png");
+   cairo_set_source_surface(cr,background,0,0);
 
-   // Bridge Left Section
-   bridge_left = cairo_image_surface_create_from_png("bridge-left.png");
-   cairo_set_source_surface(cr,bridge_left,1,100);
-   
-   cairo_paint(cr);
+   cairo_paint(cr);   
 
-   // Bridge Right Section
-   bridge_right = cairo_image_surface_create_from_png("bridge-right.png");
-   cairo_set_source_surface(cr,bridge_right,1,100);
+
+   // Clouds Section
+   clouds = cairo_image_surface_create_from_png("Clouds.png");
+   cairo_set_source_surface(cr,clouds,0,0);   
    
    cairo_paint(cr);   
+
+   // Capa3 Section
+   capa3 = cairo_image_surface_create_from_png("Capa3.png");
+   cairo_set_source_surface(cr,capa3,0,100);
    
-   // Structure Bridge Section
-   structure_bridge = cairo_image_surface_create_from_png("structure-bridge.png");
-   cairo_set_source_surface(cr,structure_bridge,1,100);
+   cairo_paint(cr);    
+
+   // Capa2 Section
+   capa2 = cairo_image_surface_create_from_png("Capa2.png");
+   cairo_set_source_surface(cr,capa2,0,30);
    
-   cairo_paint(cr);
+   cairo_paint(cr); 
+
+   // Capa1 Section
+   capa1 = cairo_image_surface_create_from_png("Capa1.png");
+   cairo_set_source_surface(cr,capa1,0,270);
+   
+   cairo_paint(cr);    
+
+   // Cars Section
+   cars = cairo_image_surface_create_from_png("Cars.png");
+   cairo_set_source_surface(cr,cars,20,440);
+   
+   cairo_paint(cr);  
+   
+   // Boats Section
+   boats = cairo_image_surface_create_from_png("Boat.png");
+   cairo_set_source_surface(cr,boats,710,450);
+   
+   cairo_paint(cr);  
+   
+
+
+   // Bridge Section
+   bridge = cairo_image_surface_create_from_png("Bridge.png");
+   cairo_set_source_surface(cr,bridge,0,100);
+   
+   cairo_paint(cr); 
+   
 
 }
  
@@ -66,11 +89,15 @@ int main (int argc, char **argv) {
    g_object_unref (app);
 
    // Destroy Section
-   cairo_surface_destroy(bus);
-   cairo_surface_destroy(car);
-   cairo_surface_destroy(bridge_left);
-   cairo_surface_destroy(bridge_right);
-   cairo_surface_destroy(structure_bridge);
+   cairo_surface_destroy(background);
+   cairo_surface_destroy(clouds);
+   cairo_surface_destroy(capa1);
+   cairo_surface_destroy(capa2);
+   cairo_surface_destroy(capa3);
+   cairo_surface_destroy(cars);
+   cairo_surface_destroy(boats);
+   
+   cairo_surface_destroy(bridge);
 
    return stat;
 }
