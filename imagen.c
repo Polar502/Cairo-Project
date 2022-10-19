@@ -1,4 +1,8 @@
 #include <gtk/gtk.h>
+#include <math.h>
+#include <time.h>
+#include <pthread.h>
+
 cairo_surface_t *background;
 
 cairo_surface_t *sun;
@@ -51,6 +55,37 @@ gint x_wave_1;
 gint x_wave_2;
 gint x_wave_3;
 gint x_wave_4;
+
+gint puente_ocupado;
+static GMutex mutex;
+
+void * hilo_x_car_right(void* arg){
+   while(1){
+      sleep(0.1);
+      if(x_car_right<1100){
+         if(x_car_right == 800){
+            g_mutex_lock (&mutex);
+            if(puente_ocupado){
+
+            }else{
+               x_car_right += 10;
+               puente_ocupado += 1;
+            }
+            g_mutex_unlock (&mutex);            
+         }else if (x_car_right == 900){
+            g_mutex_lock (&mutex);
+            puente_ocupado -= 1;
+            g_mutex_unlock (&mutex);  
+            x_car_right += 10;
+         }
+         else{
+            x_car_right += 10;
+         }
+      }else{
+         x_car_right += 10;
+      }
+   }
+}
 
 
 static void draw_function (GtkDrawingArea *area, cairo_t *cr, int width, int height, gpointer user_data) {
@@ -155,38 +190,38 @@ static void draw_function (GtkDrawingArea *area, cairo_t *cr, int width, int hei
    cairo_paint(cr); 
 
    // -------- Cars Section --------
-   if(x_car_left > -100){
-      x_car_left -= 10;
-   } else {
-      x_car_left = 1100;
-   }  
+   // if(x_car_left > -100){
+   //    x_car_left -= 10;
+   // } else {
+   //    x_car_left = 1100;
+   // }  
    car_left = cairo_image_surface_create_from_png("Car-left.png");
    cairo_set_source_surface(cr,car_left,0+x_car_left,435);
    cairo_paint(cr); 
 
-   if(x_bus_left > -100){
-      x_bus_left -= 10;
-   } else {
-      x_bus_left = 1300;
-   }  
+   // if(x_bus_left > -100){
+   //    x_bus_left -= 10;
+   // } else {
+   //    x_bus_left = 1300;
+   // }  
    bus_left = cairo_image_surface_create_from_png("Bus-left.png");
    cairo_set_source_surface(cr,bus_left,0+x_bus_left,395);
    cairo_paint(cr);    
 
-   if(x_car_right < 1100){
-      x_car_right += 10;
-   } else {
-      x_car_right = -300;
-   }  
+   // if(x_car_right < 1100){
+   //    x_car_right += 10;
+   // } else {
+   //    x_car_right = -300;
+   // }  
    car_right = cairo_image_surface_create_from_png("Car-right.png");
-   cairo_set_source_surface(cr,car_right,0+x_car_right,435);
+   cairo_set_source_surface(cr,car_right,100+x_car_right,435);
    cairo_paint(cr);    
 
-   if(x_bus_right < 1100){
-      x_bus_right += 10;
-   } else {
-      x_bus_right = -300;
-   }  
+   // if(x_bus_right < 1100){
+   //    x_bus_right += 10;
+   // } else {
+   //    x_bus_right = -300;
+   // }  
    bus_right = cairo_image_surface_create_from_png("Bus-right.png");
    cairo_set_source_surface(cr,bus_right,0+x_bus_right,395);
    cairo_paint(cr);    
@@ -248,6 +283,7 @@ static void app_activate (GApplication *app, gpointer user_data) {
 	GtkWidget *ventana = gtk_application_window_new (GTK_APPLICATION (app));
 	GtkWidget *dibujo = gtk_drawing_area_new ();
 	
+   // Establecer el tamaño de la ventana
 	gtk_window_set_title (GTK_WINDOW (ventana), "Dibujo");
 	gtk_drawing_area_set_draw_func (GTK_DRAWING_AREA (dibujo), draw_function, NULL, NULL);
 	gtk_window_set_child (GTK_WINDOW (ventana), dibujo);
@@ -278,7 +314,7 @@ int main (int argc, char **argv) {
    x_cloud5 = 770;
 
 
-   x_car_right = -800;
+   x_car_right = 0;
    x_bus_right = -200;
    x_car_left = 1100;
    x_bus_left = 1400;
@@ -288,6 +324,13 @@ int main (int argc, char **argv) {
    x_wave_3 = 0;
    x_wave_4 = 0;
 
+   puente_ocupado = 0;
+
+   pthread_t id1;
+   int ret1;
+
+   ret1=pthread_create(&id1, NULL, &hilo_x_car_right, NULL);
+
  
 	app = gtk_application_new (APPLICATION_ID, G_APPLICATION_HANDLES_OPEN);
 	g_signal_connect (app, "activate", G_CALLBACK (app_activate), NULL);
@@ -295,31 +338,5 @@ int main (int argc, char **argv) {
 	stat = g_application_run (G_APPLICATION (app), argc, argv);
 	g_object_unref (app);
 
-   // Destroy Section
-   cairo_surface_destroy(background);
-   cairo_surface_destroy(sun);
-   cairo_surface_destroy(cloud1);
-   cairo_surface_destroy(cloud2);
-   cairo_surface_destroy(airplane);
-   cairo_surface_destroy(cloud3);
-   cairo_surface_destroy(cloud4);
-   cairo_surface_destroy(cloud5);
-   cairo_surface_destroy(wheel);
-   cairo_surface_destroy(wheel_base);
-   cairo_surface_destroy(capa2);
-   cairo_surface_destroy(capa3);
-   cairo_surface_destroy(wave_1);
-   cairo_surface_destroy(wave_2);
-   cairo_surface_destroy(car_right);
-   cairo_surface_destroy(car_left);
-   cairo_surface_destroy(bus_right);
-   cairo_surface_destroy(bus_left);
-   cairo_surface_destroy(bridge_left);
-   cairo_surface_destroy(bridge_base_left);
-   cairo_surface_destroy(boat);
-   cairo_surface_destroy(bridge_right);
-   cairo_surface_destroy(bridge_base_right);
-   cairo_surface_destroy(wave_3);
-   cairo_surface_destroy(wave_4);
    return stat;
 }
