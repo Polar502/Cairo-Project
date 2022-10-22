@@ -13,8 +13,7 @@ cairo_surface_t *cloud3;
 cairo_surface_t *cloud4;
 cairo_surface_t *cloud5;
 
-cairo_surface_t *wheel;
-cairo_surface_t *wheel_base;
+cairo_surface_t *capa1;
 cairo_surface_t *capa2;
 cairo_surface_t *capa3;
 
@@ -28,12 +27,16 @@ cairo_surface_t *bus_right;
 cairo_surface_t *bus_left;
 
 cairo_surface_t *bridge_right;
-cairo_surface_t *bridge_base_right;
+cairo_surface_t *bridge_right_0;
+cairo_surface_t *bridge_right_15;
+cairo_surface_t *bridge_right_30;
 
 cairo_surface_t *boat;
 
 cairo_surface_t *bridge_left;
-cairo_surface_t *bridge_base_left;
+cairo_surface_t *bridge_left_0;
+cairo_surface_t *bridge_left_15;
+cairo_surface_t *bridge_left_30;
 
 cairo_surface_t *wave_3;
 cairo_surface_t *wave_4;
@@ -59,20 +62,20 @@ gint x_wave_4;
 gint puente_ocupado;
 static GMutex mutex;
 
-void * hilo_x_car_right(void* arg){
+void * hilo_car_right(void* arg){
    while(1){
-      sleep(0.1);
+      sleep(1);
       if(x_car_right<1100){
-         if(x_car_right == 800){
+         if(x_car_right == 250){
             g_mutex_lock (&mutex);
-            if(puente_ocupado){
+            if(puente_ocupado == 1){
 
             }else{
                x_car_right += 10;
                puente_ocupado += 1;
             }
             g_mutex_unlock (&mutex);            
-         }else if (x_car_right == 900){
+         }else if (x_car_right == 810){
             g_mutex_lock (&mutex);
             puente_ocupado -= 1;
             g_mutex_unlock (&mutex);  
@@ -82,10 +85,39 @@ void * hilo_x_car_right(void* arg){
             x_car_right += 10;
          }
       }else{
-         x_car_right += 10;
+         x_car_right = 0;
       }
    }
 }
+
+void * hilo_boat(void* arg){
+   while(1){
+      sleep(1);
+      if(x_boat > -10){
+         if(x_boat == 800){
+            g_mutex_lock (&mutex);
+            if(puente_ocupado == 1){
+
+            }else{
+               x_boat -= 10;
+               puente_ocupado += 1;
+            }
+            g_mutex_unlock (&mutex);            
+         }else if (x_boat == 400){
+            g_mutex_lock (&mutex);
+            puente_ocupado -= 1;
+            g_mutex_unlock (&mutex);  
+            x_boat -= 10;
+         }
+         else{
+            x_boat -= 10;
+         }
+      }else{
+         x_boat = 900;
+      }
+   }
+}
+
 
 
 static void draw_function (GtkDrawingArea *area, cairo_t *cr, int width, int height, gpointer user_data) {
@@ -155,12 +187,9 @@ static void draw_function (GtkDrawingArea *area, cairo_t *cr, int width, int hei
    cairo_paint(cr);     
 
    // ========== buildings background ==========
-   wheel = cairo_image_surface_create_from_png("Wheel.png");
-   cairo_set_source_surface(cr,wheel,41,123);
-   cairo_paint(cr);     
 
-   wheel_base = cairo_image_surface_create_from_png("Wheel-base.png");
-   cairo_set_source_surface(cr,wheel_base,-25,220);
+   capa1 = cairo_image_surface_create_from_png("Capa-1.png");
+   cairo_set_source_surface(cr,capa1,-25,115);
    cairo_paint(cr);    
 
    capa2 = cairo_image_surface_create_from_png("Capa-2.png");
@@ -206,15 +235,15 @@ static void draw_function (GtkDrawingArea *area, cairo_t *cr, int width, int hei
    // }  
    bus_left = cairo_image_surface_create_from_png("Bus-left.png");
    cairo_set_source_surface(cr,bus_left,0+x_bus_left,395);
-   cairo_paint(cr);    
+   cairo_paint(cr);
 
    // if(x_car_right < 1100){
    //    x_car_right += 10;
    // } else {
-   //    x_car_right = -300;
+   //    x_car_right = 0;
    // }  
    car_right = cairo_image_surface_create_from_png("Car-right.png");
-   cairo_set_source_surface(cr,car_right,100+x_car_right,435);
+   cairo_set_source_surface(cr,car_right,0+x_car_right,435);
    cairo_paint(cr);    
 
    // if(x_bus_right < 1100){
@@ -229,27 +258,38 @@ static void draw_function (GtkDrawingArea *area, cairo_t *cr, int width, int hei
 
 // ========== Buildings Bridge ==========
 
-   bridge_left = cairo_image_surface_create_from_png("Bridge-left.png");
-   cairo_set_source_surface(cr,bridge_left,360,400);
-   cairo_paint(cr); 
-
-   bridge_base_left = cairo_image_surface_create_from_png("Bridge-base-left.png");
-   cairo_set_source_surface(cr,bridge_base_left,0,150);
+   if(x_boat >= 800){
+      bridge_left = cairo_image_surface_create_from_png("Bridge-l-0.png");
+      bridge_right = cairo_image_surface_create_from_png("Bridge-r-0.png");
+   } else if(x_boat<800 && x_boat >=700){
+      bridge_left = cairo_image_surface_create_from_png("Bridge-l-15.png");
+      bridge_right = cairo_image_surface_create_from_png("Bridge-r-15.png");
+   }else if(x_boat<700 && x_boat >=500){
+      bridge_left = cairo_image_surface_create_from_png("Bridge-l-30.png");
+      bridge_right = cairo_image_surface_create_from_png("Bridge-r-30.png");
+   }else if(x_boat<500 && x_boat >=400){
+      bridge_left = cairo_image_surface_create_from_png("Bridge-l-15.png");
+      bridge_right = cairo_image_surface_create_from_png("Bridge-r-15.png");
+   }else if(x_boat<400){
+      bridge_left = cairo_image_surface_create_from_png("Bridge-l-0.png");
+      bridge_right = cairo_image_surface_create_from_png("Bridge-r-0.png");
+   }
+   cairo_set_source_surface(cr,bridge_left,0,125);
    cairo_paint(cr); 
 
    // -------- Boat Section --------
-   x_boat -= 4;
+   // if(x_boat > -100){
+   //    x_boat -= 10;
+   // } else {
+   //    x_boat = 1100;
+   // }  
    boat = cairo_image_surface_create_from_png("Boat-1.png");
-   cairo_set_source_surface(cr,boat,600+x_boat,400);
+   cairo_set_source_surface(cr,boat,0+x_boat,400);
    cairo_paint(cr); 
 
-   bridge_right = cairo_image_surface_create_from_png("Bridge-right.png");
-   cairo_set_source_surface(cr,bridge_right,630,400);
+   cairo_set_source_surface(cr,bridge_right,398,125);
    cairo_paint(cr); 
 
-   bridge_base_right = cairo_image_surface_create_from_png("Bridge-base-right.png");
-   cairo_set_source_surface(cr,bridge_base_right,400,150);
-   cairo_paint(cr); 
 
    // -------- Wave front --------
    if(x_wave_3 < 300){
@@ -313,12 +353,11 @@ int main (int argc, char **argv) {
    x_cloud4 = 450;
    x_cloud5 = 770;
 
-
    x_car_right = 0;
    x_bus_right = -200;
    x_car_left = 1100;
    x_bus_left = 1400;
-   x_boat = 1100;
+   x_boat = 900;
    x_wave_1 = 0;
    x_wave_2 = 0;
    x_wave_3 = 0;
@@ -329,7 +368,12 @@ int main (int argc, char **argv) {
    pthread_t id1;
    int ret1;
 
-   ret1=pthread_create(&id1, NULL, &hilo_x_car_right, NULL);
+   ret1=pthread_create(&id1, NULL, &hilo_car_right, NULL);
+
+   pthread_t id2;
+   int ret2;
+
+   ret2=pthread_create(&id2, NULL, &hilo_boat, NULL);
 
  
 	app = gtk_application_new (APPLICATION_ID, G_APPLICATION_HANDLES_OPEN);
