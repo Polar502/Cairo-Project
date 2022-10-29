@@ -32,16 +32,15 @@ gint x_cloud2;
 gint x_cloud3;
 gint x_cloud4;
 gint x_cloud5;
-
 gint x_car_right;
 gint x_airplane;
 gint x_boat;
-
 gint x_wave_1;
 gint x_wave_2;
 gint x_wave_3;
 gint x_wave_4;
 
+//Condition variables
 gint puente_ocupado;
 
 static GMutex mutex;
@@ -198,7 +197,6 @@ static void draw_function (GtkDrawingArea *area, cairo_t *cr, int width, int hei
    cairo_paint(cr);    
 
 // ========== Buildings Bridge ==========
-
    if(x_boat >= 800){
       bridge_left = cairo_image_surface_create_from_png("Bridge-l-0.png");
       bridge_right = cairo_image_surface_create_from_png("Bridge-r-0.png");
@@ -271,6 +269,7 @@ static void app_activate (GApplication *app, gpointer user_data) {
 	gtk_widget_show(ventana);
  
 }
+
 static void app_open (GApplication *app, GFile **files, gint n_files, gchar *hint, gpointer user_data) {
 	app_activate(app,user_data);
 }
